@@ -1,22 +1,34 @@
 {
   "expo": {
-    "name": "evolve",
-    "slug": "evolve",
+    "name": "MacroMetriq",
+    "slug": "macrometriq",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "evolve",
+    "scheme": "macrometriq",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gomacrometriq.macrometriq",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs camera access to scan food barcodes for nutrition tracking.",
+        "NSMicrophoneUsageDescription": "This app needs microphone access for video recording.",
+        "NSHealthShareUsageDescription": "We need access to read your workout data to track your fitness activities.",
+        "NSHealthUpdateUsageDescription": "We need access to save workout data."
+      },
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.gomacrometriq.macrometriq",
+      "permissions": [
+        "CAMERA"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -31,9 +43,23 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#3A3A3C"
         }
-      ]
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "This app needs camera access to scan food barcodes for nutrition tracking.",
+          "microphonePermission": "This app needs microphone access for video recording."
+        }
+      ],
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "This app needs camera access to scan food barcodes for nutrition tracking."
+        }
+      ],
+      "react-native-health"
     ],
     "experiments": {
       "typedRoutes": true

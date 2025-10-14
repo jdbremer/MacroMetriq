@@ -13,33 +13,59 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="dashboard"
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        lazy: false,
+        tabBarActiveTintColor: '#EAEAEA',
+        tabBarInactiveTintColor: '#9E9E9E',
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
+        tabBarStyle: {
+          height: 88,
+          paddingBottom: 34,
+          paddingTop: 8,
+          borderTopWidth: 0,
+          backgroundColor: '#121212',
+          ...Platform.select({
+            ios: {
+              position: 'absolute',
+            },
+          }),
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
       }}>
       <Tabs.Screen
-        name="index"
+        name="dashboard"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Dashboard',
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="chart.bar.fill" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="fitness"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Fitness',
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="figure.run" color={color} />,
         }}
       />
+        <Tabs.Screen
+            name="meals"
+            options={{
+                title: 'Meals',
+                tabBarIcon: ({ color }) => <IconSymbol size={24} name="fork.knife" color={color} />,
+                tabBarIcon: ({ color }) => <IconSymbol size={24} name="fork.knife" color={color} />,
+            }}
+        />
+        <Tabs.Screen
+            name="more"
+            options={{
+                title: 'More',
+                tabBarIcon: ({ color }) => <IconSymbol size={24} name="menucard" color={color} />,
+            }}
+        />
     </Tabs>
   );
 }
