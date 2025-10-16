@@ -11,6 +11,7 @@ import BarcodeScanner from '@/components/BarcodeScanner';
 interface Ingredient {
   name: string;
   servingMultiplier: number;
+  gramWeight?: number;
   calories: number;
   protein: number;
   carbs: number;

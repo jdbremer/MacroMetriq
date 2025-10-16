@@ -59,7 +59,8 @@
           "cameraPermissionText": "This app needs camera access to scan food barcodes for nutrition tracking."
         }
       ],
-      "react-native-health"
+      "react-native-health",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true

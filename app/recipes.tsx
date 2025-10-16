@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 interface Ingredient {
   name: string;
   servingMultiplier: number;
+  gramWeight?: number;
   calories: number;
   protein: number;
   carbs: number;
@@ -111,7 +112,7 @@ export default function RecipesScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ThemedText style={styles.backButtonText}>‹</ThemedText>
         </TouchableOpacity>
-        <ThemedText type="title">Recipes</ThemedText>
+        <ThemedText type="title" style={styles.titleText}>Recipes</ThemedText>
         <ThemedView style={styles.placeholder} />
       </ThemedView>
 
@@ -200,34 +201,35 @@ export default function RecipesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#3A3A3C' },
+  container: { flex: 1, backgroundColor: '#121212' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingBottom: 16,
-    backgroundColor: 'rgba(58,58,60,0.95)',
+    backgroundColor: 'rgba(18,18,18,0.95)',
   },
   backButton: { padding: 8 },
-  backButtonText: { fontSize: 32, fontWeight: 'bold' },
+  backButtonText: { fontSize: 32, fontWeight: 'bold', color: '#EAEAEA' },
+  titleText: { color: '#EAEAEA' },
   placeholder: { width: 48, backgroundColor: 'transparent' },
   content: { flex: 1, padding: 20, backgroundColor: 'transparent' },
   createButton: {
-    backgroundColor: '#000000',
+    backgroundColor: '#2A2A2A',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 16,
   },
-  createButtonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16 },
+  createButtonText: { color: '#EAEAEA', fontWeight: 'bold', fontSize: 16 },
   searchInput: {
     backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 8,
     padding: 12,
-    color: '#FFFFFF',
+    color: '#EAEAEA',
     marginBottom: 16,
-    borderColor: '#121212',
+    borderColor: '#2A2A2A',
     borderWidth: 1,
   },
   recipeList: { flex: 1 },
@@ -236,11 +238,11 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     marginBottom: 12,
-    borderColor: '#121212',
+    borderColor: '#2A2A2A',
     borderWidth: 1,
   },
-  recipeName: { fontSize: 18, fontWeight: 'bold', marginBottom: 4 },
-  recipeDetails: { fontSize: 14, color: '#999' },
+  recipeName: { fontSize: 18, fontWeight: 'bold', marginBottom: 4, color: '#EAEAEA' },
+  recipeDetails: { fontSize: 14, color: '#9E9E9E' },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -248,11 +250,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#3A3A3C',
+    backgroundColor: '#121212',
     borderRadius: 12,
     padding: 20,
     maxHeight: '80%',
-    borderColor: '#121212',
+    borderColor: '#2A2A2A',
     borderWidth: 1,
   },
   modalHeader: {
@@ -263,9 +265,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   closeButton: { position: 'absolute', right: 0, padding: 4 },
-  closeButtonText: { fontSize: 24, color: '#FFFFFF' },
-  nutritionLabel: { fontSize: 14, color: '#999', marginTop: 12, marginBottom: 4 },
-  ingredientsLabel: { fontSize: 14, color: '#999', marginTop: 16, marginBottom: 8 },
+  closeButtonText: { fontSize: 24, color: '#EAEAEA' },
+  nutritionLabel: { fontSize: 14, color: '#9E9E9E', marginTop: 12, marginBottom: 4 },
+  ingredientsLabel: { fontSize: 14, color: '#9E9E9E', marginTop: 16, marginBottom: 8 },
   ingredientsList: { maxHeight: 200, marginBottom: 16 },
   ingredientItem: {
     backgroundColor: 'rgba(255,255,255,0.05)',
@@ -273,7 +275,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
   },
-  ingredientDetails: { fontSize: 12, color: '#999', marginTop: 4 },
+  ingredientDetails: { fontSize: 12, color: '#9E9E9E', marginTop: 4 },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -282,6 +284,6 @@ const styles = StyleSheet.create({
   },
   modalButton: { flex: 1, padding: 12, borderRadius: 8, alignItems: 'center', marginHorizontal: 4 },
   deleteButton: { backgroundColor: '#CC0000' },
-  editButton: { backgroundColor: '#000000' },
-  buttonText: { color: '#FFFFFF' },
+  editButton: { backgroundColor: '#2A2A2A' },
+  buttonText: { color: '#EAEAEA' },
 });

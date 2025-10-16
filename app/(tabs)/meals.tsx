@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   InteractionManager,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
@@ -31,6 +32,8 @@ interface NutritionData {
   saturatedFat: number;
   transFat: number;
   unsaturatedFat: number;
+  servingSize?: string;
+  gramWeight?: number;
 }
 
 interface RecentFood extends NutritionData {
@@ -91,6 +94,90 @@ const mapOpenFoodFactsToForm = (p: OFFProduct): NutritionData => {
   };
 };
 
+// Check if USDA food has actual serving size data (not default 100g)
+const hasServingSize = (food: any): boolean => {
+  if (food.servingSize && food.servingSizeUnit) return true;
+  if (food.servingSize) return true;
+  if (food.foodPortions && food.foodPortions.length > 0) {
+    return food.foodPortions.some((p: any) => p.gramWeight);
+  }
+  return false;
+};
+
+// USDA FoodData Central mapping
+const mapUSDAToForm = (food: any): NutritionData => {
+  const nutrients = food.foodNutrients || [];
+
+  const getNutrient = (nutrientId: number) => {
+    const nutrient = nutrients.find((n: any) => n.nutrientId === nutrientId);
+    return nutrient ? Number(nutrient.value || 0) : 0;
+  };
+
+  // USDA Nutrient IDs
+  // 1008 = Energy (kcal)
+  // 1003 = Protein
+  // 1005 = Carbohydrate
+  // 1079 = Fiber
+  // 2000 = Sugars, total
+  // 1004 = Total lipid (fat)
+  // 1258 = Fatty acids, total saturated
+  // 1257 = Fatty acids, total trans
+  // 1292 = Fatty acids, total monounsaturated
+  // 1293 = Fatty acids, total polyunsaturated
+
+  const monounsaturated = getNutrient(1292);
+  const polyunsaturated = getNutrient(1293);
+
+  // Extract serving size from USDA API
+  // USDA provides: servingSize, servingSizeUnit, or foodPortions array
+  let servingSize = '100g'; // default
+  let gramWeight = 100; // default gram weight
+
+  if (food.servingSize && food.servingSizeUnit) {
+    servingSize = `${food.servingSize}${food.servingSizeUnit}`;
+    gramWeight = Number(food.servingSize) || 100;
+  } else if (food.servingSize) {
+    servingSize = `${food.servingSize}g`;
+    gramWeight = Number(food.servingSize) || 100;
+  } else if (food.foodPortions && food.foodPortions.length > 0) {
+    // Use the first portion if available
+    const portion = food.foodPortions[0];
+    if (portion.gramWeight) {
+      gramWeight = Number(portion.gramWeight);
+      servingSize = `${portion.gramWeight}g`;
+      if (portion.modifier) {
+        servingSize = `${portion.gramWeight}g (${portion.modifier})`;
+      }
+    }
+  }
+
+  // Debug: log the food object to see what's available
+  if (__DEV__) {
+    console.log('USDA Food Object:', JSON.stringify({
+      description: food.description,
+      servingSize: food.servingSize,
+      servingSizeUnit: food.servingSizeUnit,
+      foodPortions: food.foodPortions,
+      calculatedGramWeight: gramWeight,
+    }, null, 2));
+  }
+
+  return {
+    name: food.description || 'Unknown Food',
+    calories: Math.round(getNutrient(1008)),
+    protein: Number(getNutrient(1003).toFixed(1)),
+    carbs: Number(getNutrient(1005).toFixed(1)),
+    fiber: Number(getNutrient(1079).toFixed(1)),
+    sugars: Number(getNutrient(2000).toFixed(1)),
+    totalFat: Number(getNutrient(1004).toFixed(1)),
+    saturatedFat: Number(getNutrient(1258).toFixed(1)),
+    transFat: Number(getNutrient(1257).toFixed(1)),
+    unsaturatedFat: Number((monounsaturated + polyunsaturated).toFixed(1)),
+    servingSize,
+    gramWeight,
+  };
+};
+
 export default function MealsScreen() {
   const insets = useSafeAreaInsets();
 
@@ -119,6 +206,7 @@ export default function MealsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [servingMultiplier, setServingMultiplier] = useState(1);
   const [baseNutrition, setBaseNutrition] = useState<NutritionData | null>(null);
+  const [currentGramWeight, setCurrentGramWeight] = useState<number>(100);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
@@ -140,12 +228,21 @@ export default function MealsScreen() {
   const [mealsLoaded, setMealsLoaded] = useState(false);
   const [loadedDate, setLoadedDate] = useState<string | null>(null);
   const [animKey, setAnimKey] = useState(0);
-  
+  const menuAnimation = useRef(new Animated.Value(0)).current;
+
   useFocusEffect(
     useCallback(() => {
       setAnimKey(prev => prev + 1);
     }, [])
   );
+
+  useEffect(() => {
+    Animated.timing(menuAnimation, {
+      toValue: actionsMenuOpen ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [actionsMenuOpen]);
   
   // Pre-compute date strings and current hour
   const selectedDateStr = useMemo(() => selectedDate.toISOString().split('T')[0], [selectedDate]);
@@ -770,17 +867,36 @@ export default function MealsScreen() {
         <ThemedView style={styles.container}>
           <ThemedView style={[styles.header, { paddingTop: insets.top + 20 }]}>
             <ThemedView style={styles.titleRow}>
+              <ThemedView style={{ width: 80 }} />
+              <ThemedText type="title" style={{ color: '#EAEAEA' }}>Meals</ThemedText>
               <TouchableOpacity
                   style={styles.actionsButton}
                   onPress={() => setActionsMenuOpen(!actionsMenuOpen)}
               >
                 <ThemedText style={styles.actionsButtonText}>Actions</ThemedText>
               </TouchableOpacity>
-              <ThemedText type="title" style={{ color: '#EAEAEA' }}>Meals</ThemedText>
-              <ThemedView style={{ width: 80 }} />
             </ThemedView>
             {actionsMenuOpen && (
-                <ThemedView style={styles.actionsMenu}>
+                <Animated.View style={[
+                  styles.actionsMenu,
+                  {
+                    opacity: menuAnimation,
+                    transform: [
+                      {
+                        scale: menuAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0.95, 1],
+                        }),
+                      },
+                      {
+                        translateY: menuAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [-10, 0],
+                        }),
+                      },
+                    ],
+                  },
+                ]}>
                   <TouchableOpacity
                       style={styles.actionMenuItem}
                       onPress={() => {
@@ -793,7 +909,13 @@ export default function MealsScreen() {
                         loadRecipes();
                       }}
                   >
-                    <ThemedText style={styles.actionMenuText}>Quick Add</ThemedText>
+                    <ThemedView style={styles.actionMenuItemContent}>
+                      <ThemedText style={styles.actionMenuIcon}>➕</ThemedText>
+                      <ThemedView style={styles.actionMenuTextContainer}>
+                        <ThemedText style={styles.actionMenuTitle}>Quick Add</ThemedText>
+                        <ThemedText style={styles.actionMenuSubtitle}>Log food for now</ThemedText>
+                      </ThemedView>
+                    </ThemedView>
                   </TouchableOpacity>
                   <TouchableOpacity
                       style={styles.actionMenuItem}
@@ -802,18 +924,30 @@ export default function MealsScreen() {
                         router.push('/recipes');
                       }}
                   >
-                    <ThemedText style={styles.actionMenuText}>Recipes</ThemedText>
+                    <ThemedView style={styles.actionMenuItemContent}>
+                      <ThemedText style={styles.actionMenuIcon}>📖</ThemedText>
+                      <ThemedView style={styles.actionMenuTextContainer}>
+                        <ThemedText style={styles.actionMenuTitle}>Recipes</ThemedText>
+                        <ThemedText style={styles.actionMenuSubtitle}>View and manage recipes</ThemedText>
+                      </ThemedView>
+                    </ThemedView>
                   </TouchableOpacity>
                   <TouchableOpacity
-                      style={styles.actionMenuItem}
+                      style={[styles.actionMenuItem, styles.lastActionMenuItem]}
                       onPress={() => {
                         setActionsMenuOpen(false);
                         setNutritionModalVisible(true);
                       }}
                   >
-                    <ThemedText style={styles.actionMenuText}>Nutrition</ThemedText>
+                    <ThemedView style={styles.actionMenuItemContent}>
+                      <ThemedText style={styles.actionMenuIcon}>📊</ThemedText>
+                      <ThemedView style={styles.actionMenuTextContainer}>
+                        <ThemedText style={styles.actionMenuTitle}>Nutrition</ThemedText>
+                        <ThemedText style={styles.actionMenuSubtitle}>View detailed stats</ThemedText>
+                      </ThemedView>
+                    </ThemedView>
                   </TouchableOpacity>
-                </ThemedView>
+                </Animated.View>
             )}
             <ThemedView style={styles.macroSummary}>
               <ThemedView style={styles.macroItem}>
@@ -921,7 +1055,15 @@ export default function MealsScreen() {
           <Modal animationType="slide" transparent visible={modalVisible} onRequestClose={resetModal}>
             <ThemedView style={styles.modalOverlay}>
               <ScrollView style={styles.modalScrollView}>
-                <ThemedView style={styles.modalContent}>
+                <ThemedView style={[
+                  styles.modalContent,
+                  (
+                    (showSearch && searchResults.filter(p => hasServingSize(p)).length > 0) ||
+                    showManualForm ||
+                    (showHistory && foodHistory.length > 0) ||
+                    (showRecipes && recipes.length > 0)
+                  ) && styles.modalContentExpanded
+                ]}>
                   <ThemedView style={styles.modalHeader}>
                     <ThemedText type="subtitle" style={[styles.modalTitle, { color: '#EAEAEA' }]}>
                       Add meal for {formatHour(selectedHour)}
@@ -970,56 +1112,61 @@ export default function MealsScreen() {
                             placeholder="Search foods..."
                             placeholderTextColor="#999"
                             value={searchQuery}
-                            onChangeText={(text) => {
-                              setSearchQuery(text);
-                              if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-                              if (text.trim().length > 2) {
+                            onChangeText={setSearchQuery}
+                            onSubmitEditing={async () => {
+                              if (searchQuery.trim().length > 2) {
                                 setSearchLoading(true);
-                                searchTimeoutRef.current = setTimeout(async () => {
-                                  try {
-                                    const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(text)}&search_simple=1&action=process&json=1&page_size=20`);
-                                    const data = await res.json();
-                                    setSearchResults(data.products || []);
-                                  } catch (e) {
-                                    console.error('Search error:', e);
-                                  }
-                                  setSearchLoading(false);
-                                }, 500);
-                              } else {
-                                setSearchResults([]);
+                                try {
+                                  const apiKey = 'rMin6NojFBwrfeRUGfKgdAf8NnAPYAThJHIrJEqE';
+                                  const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(searchQuery)}&pageSize=50&api_key=${apiKey}`);
+                                  const data = await res.json();
+                                  setSearchResults(data.foods || []);
+                                } catch (e) {
+                                  console.error('Search error:', e);
+                                  setSearchResults([]);
+                                }
                                 setSearchLoading(false);
                               }
                             }}
+                            returnKeyType="search"
                         />
                         {searchLoading && (
                             <ThemedText style={{ textAlign: 'center', marginBottom: 8, color: '#EAEAEA' }}>⏳ Searching...</ThemedText>
                         )}
-                        <ThemedView style={styles.searchResultsContainer}>
-                          <ScrollView style={styles.searchResultsList} nestedScrollEnabled={true}>
-                            {searchResults.map((product, idx) => {
-                              const mapped = mapOpenFoodFactsToForm(product);
-                              return (
-                                  <TouchableOpacity
-                                      key={idx}
-                                      style={styles.historyItem}
-                                      onPress={() => {
-                                        setNutritionForm(mapped);
-                                        setBaseNutrition(mapped);
-                                        setServingMultiplier(1);
-                                        setShowSearch(false);
-                                        setSearchResults([]);
-                                        setShowManualForm(true);
-                                      }}
-                                  >
-                                    <ThemedText style={styles.historyItemName}>{mapped.name}</ThemedText>
-                                    <ThemedText style={styles.historyItemDetails}>
-                                      {mapped.calories} cal • {mapped.protein}g protein
-                                    </ThemedText>
-                                  </TouchableOpacity>
-                              );
-                            })}
-                          </ScrollView>
-                        </ThemedView>
+                        {!searchLoading && searchResults.length > 0 && searchResults.filter(p => hasServingSize(p)).length === 0 && (
+                            <ThemedText style={{ textAlign: 'center', marginBottom: 8, color: '#9E9E9E' }}>No products found with serving size information</ThemedText>
+                        )}
+                        {searchResults.filter(p => hasServingSize(p)).length > 0 && (
+                          <ThemedView style={styles.searchResultsContainer}>
+                            <ScrollView style={styles.searchResultsList} nestedScrollEnabled={true}>
+                              {searchResults
+                                .filter(product => hasServingSize(product))
+                                .map((product, idx) => {
+                                  const mapped = mapUSDAToForm(product);
+                                  return (
+                                      <TouchableOpacity
+                                          key={idx}
+                                          style={styles.historyItem}
+                                          onPress={() => {
+                                            setNutritionForm(mapped);
+                                            setBaseNutrition(mapped);
+                                            setServingMultiplier(1);
+                                            setCurrentGramWeight(mapped.gramWeight || 100);
+                                            setShowSearch(false);
+                                            setSearchResults([]);
+                                            setShowManualForm(true);
+                                          }}
+                                      >
+                                        <ThemedText style={styles.historyItemName}>{mapped.name}</ThemedText>
+                                        <ThemedText style={styles.historyItemDetails}>
+                                          {mapped.servingSize} • {mapped.calories} cal • {mapped.protein}g protein
+                                        </ThemedText>
+                                      </TouchableOpacity>
+                                  );
+                                })}
+                            </ScrollView>
+                          </ThemedView>
+                        )}
                         <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => { setShowSearch(false); setSearchResults([]); }}>
                           <ThemedText style={{ color: '#EAEAEA' }}>Back</ThemedText>
                         </TouchableOpacity>
@@ -1127,8 +1274,11 @@ export default function MealsScreen() {
                                 <TouchableOpacity
                                     style={styles.servingButton}
                                     onPress={() => {
-                                      const newMultiplier = Math.max(0.25, servingMultiplier - 0.25);
+                                      const newMultiplier = Number(Math.max(0.25, servingMultiplier - 0.25).toFixed(2));
                                       setServingMultiplier(newMultiplier);
+                                      if (baseNutrition.gramWeight) {
+                                        setCurrentGramWeight(Number((baseNutrition.gramWeight * newMultiplier).toFixed(2)));
+                                      }
                                       setNutritionForm({
                                         ...baseNutrition,
                                         calories: Math.round(baseNutrition.calories * newMultiplier),
@@ -1149,8 +1299,11 @@ export default function MealsScreen() {
                                 <TouchableOpacity
                                     style={styles.servingButton}
                                     onPress={() => {
-                                      const newMultiplier = servingMultiplier + 0.25;
+                                      const newMultiplier = Number((servingMultiplier + 0.25).toFixed(2));
                                       setServingMultiplier(newMultiplier);
+                                      if (baseNutrition.gramWeight) {
+                                        setCurrentGramWeight(Number((baseNutrition.gramWeight * newMultiplier).toFixed(2)));
+                                      }
                                       setNutritionForm({
                                         ...baseNutrition,
                                         calories: Math.round(baseNutrition.calories * newMultiplier),
@@ -1167,6 +1320,38 @@ export default function MealsScreen() {
                                 >
                                   <ThemedText style={styles.servingButtonText}>+</ThemedText>
                                 </TouchableOpacity>
+                              </ThemedView>
+
+                              <ThemedView style={styles.servingSection}>
+                                <ThemedText style={styles.fieldLabel}>Gram Weight</ThemedText>
+                                <TextInput
+                                    style={styles.gramWeightInput}
+                                    placeholder="Grams"
+                                    placeholderTextColor="#999"
+                                    value={currentGramWeight.toString()}
+                                    onChangeText={(text) => {
+                                      const newGrams = parseFloat(text) || 0;
+                                      setCurrentGramWeight(newGrams);
+                                      if (baseNutrition && baseNutrition.gramWeight) {
+                                        const ratio = newGrams / baseNutrition.gramWeight;
+                                        const roundedRatio = Number(ratio.toFixed(2));
+                                        setNutritionForm({
+                                          ...baseNutrition,
+                                          calories: Math.round(baseNutrition.calories * ratio),
+                                          protein: Number((baseNutrition.protein * ratio).toFixed(1)),
+                                          carbs: Number((baseNutrition.carbs * ratio).toFixed(1)),
+                                          fiber: Number((baseNutrition.fiber * ratio).toFixed(1)),
+                                          sugars: Number((baseNutrition.sugars * ratio).toFixed(1)),
+                                          totalFat: Number((baseNutrition.totalFat * ratio).toFixed(1)),
+                                          saturatedFat: Number((baseNutrition.saturatedFat * ratio).toFixed(1)),
+                                          transFat: Number((baseNutrition.transFat * ratio).toFixed(1)),
+                                          unsaturatedFat: Number((baseNutrition.unsaturatedFat * ratio).toFixed(1)),
+                                        });
+                                        setServingMultiplier(roundedRatio);
+                                      }
+                                    }}
+                                    keyboardType="numeric"
+                                />
                               </ThemedView>
                             </ThemedView>
                         )}
@@ -1324,8 +1509,11 @@ export default function MealsScreen() {
                           <TouchableOpacity
                               style={styles.servingButton}
                               onPress={() => {
-                                const newMultiplier = Math.max(0.25, servingMultiplier - 0.25);
+                                const newMultiplier = Number(Math.max(0.25, servingMultiplier - 0.25).toFixed(2));
                                 setServingMultiplier(newMultiplier);
+                                if (baseNutrition.gramWeight) {
+                                  setCurrentGramWeight(Number((baseNutrition.gramWeight * newMultiplier).toFixed(2)));
+                                }
                                 setNutritionForm({
                                   ...baseNutrition,
                                   calories: Math.round(baseNutrition.calories * newMultiplier),
@@ -1346,8 +1534,11 @@ export default function MealsScreen() {
                           <TouchableOpacity
                               style={styles.servingButton}
                               onPress={() => {
-                                const newMultiplier = servingMultiplier + 0.25;
+                                const newMultiplier = Number((servingMultiplier + 0.25).toFixed(2));
                                 setServingMultiplier(newMultiplier);
+                                if (baseNutrition.gramWeight) {
+                                  setCurrentGramWeight(Number((baseNutrition.gramWeight * newMultiplier).toFixed(2)));
+                                }
                                 setNutritionForm({
                                   ...baseNutrition,
                                   calories: Math.round(baseNutrition.calories * newMultiplier),
@@ -1364,6 +1555,38 @@ export default function MealsScreen() {
                           >
                             <ThemedText style={styles.servingButtonText}>+</ThemedText>
                           </TouchableOpacity>
+                        </ThemedView>
+
+                        <ThemedView style={styles.servingSection}>
+                          <ThemedText style={styles.fieldLabel}>Gram Weight</ThemedText>
+                          <TextInput
+                              style={styles.gramWeightInput}
+                              placeholder="Grams"
+                              placeholderTextColor="#999"
+                              value={currentGramWeight.toString()}
+                              onChangeText={(text) => {
+                                const newGrams = parseFloat(text) || 0;
+                                setCurrentGramWeight(newGrams);
+                                if (baseNutrition && baseNutrition.gramWeight) {
+                                  const ratio = newGrams / baseNutrition.gramWeight;
+                                  const roundedRatio = Number(ratio.toFixed(2));
+                                  setNutritionForm({
+                                    ...baseNutrition,
+                                    calories: Math.round(baseNutrition.calories * ratio),
+                                    protein: Number((baseNutrition.protein * ratio).toFixed(1)),
+                                    carbs: Number((baseNutrition.carbs * ratio).toFixed(1)),
+                                    fiber: Number((baseNutrition.fiber * ratio).toFixed(1)),
+                                    sugars: Number((baseNutrition.sugars * ratio).toFixed(1)),
+                                    totalFat: Number((baseNutrition.totalFat * ratio).toFixed(1)),
+                                    saturatedFat: Number((baseNutrition.saturatedFat * ratio).toFixed(1)),
+                                    transFat: Number((baseNutrition.transFat * ratio).toFixed(1)),
+                                    unsaturatedFat: Number((baseNutrition.unsaturatedFat * ratio).toFixed(1)),
+                                  });
+                                  setServingMultiplier(roundedRatio);
+                                }
+                              }}
+                              keyboardType="numeric"
+                          />
                         </ThemedView>
                       </ThemedView>
                   )}
@@ -1718,7 +1941,8 @@ const styles = StyleSheet.create({
   actionsMenu: {
     position: 'absolute',
     top: 60,
-    left: 20,
+    right: 20,
+    width: 240,
     backgroundColor: '#121212',
     borderRadius: 8,
     borderColor: '#2A2A2A',
@@ -1736,9 +1960,31 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#2A2A2A',
   },
-  actionMenuText: {
+  actionMenuItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  actionMenuIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  actionMenuTextContainer: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  actionMenuTitle: {
     color: '#EAEAEA',
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  actionMenuSubtitle: {
+    color: '#9E9E9E',
+    fontSize: 12,
+  },
+  lastActionMenuItem: {
+    borderBottomWidth: 0,
   },
   macroSummary: {
     flexDirection: 'row',
@@ -1875,9 +2121,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     marginHorizontal: 20,
-    marginVertical: 60,
+    marginTop: 52,
+    marginBottom: 60,
     borderColor: '#2A2A2A',
     borderWidth: 1,
+  },
+  modalContentExpanded: {
+    marginVertical: 20,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -1908,6 +2158,20 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderColor: '#2A2A2A',
     borderWidth: 1,
+  },
+  gramWeightInput: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 8,
+    padding: 12,
+    color: '#EAEAEA',
+    marginBottom: 12,
+    borderColor: '#2A2A2A',
+    borderWidth: 1,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '600',
+    width: 200,
+    alignSelf: 'center',
   },
   nutritionRow: {
     flexDirection: 'row',
@@ -1960,10 +2224,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   cancelButton: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: '#CC0000',
   },
   addButton2: {
-    backgroundColor: '#2A2A2A',
+    backgroundColor: '#007AFF',
   },
   deleteButton: {
     backgroundColor: '#CC0000',
@@ -1976,7 +2240,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   searchResultsContainer: {
-    height: 250,
+    height: 450,
     marginBottom: 12,
     backgroundColor: 'transparent',
   },
@@ -2004,6 +2268,7 @@ const styles = StyleSheet.create({
   servingSection: {
     marginBottom: 16,
     backgroundColor: 'transparent',
+    alignItems: 'center',
   },
   servingControls: {
     flexDirection: 'row',

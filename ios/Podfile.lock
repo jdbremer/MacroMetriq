@@ -212,6 +212,9 @@ PODS:
     - ExpoModulesCore
   - ExpoFont (14.0.9):
     - ExpoModulesCore
+  - ExpoGL (16.0.7):
+    - ExpoModulesCore
+    - ReactCommon/turbomodule/core
   - ExpoHaptics (15.0.7):
     - ExpoModulesCore
   - ExpoHead (6.0.12):
@@ -1609,6 +1612,10 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
+  - react-native-quick-base64 (2.2.2):
+    - React-Core
+  - react-native-randombytes (3.6.2):
+    - React-Core
   - react-native-safe-area-context (5.6.1):
     - hermes-engine
     - RCTRequired
@@ -2374,6 +2381,7 @@ DEPENDENCIES:
   - ExpoCamera (from `../node_modules/expo-camera/ios`)
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoFont (from `../node_modules/expo-font/ios`)
+  - ExpoGL (from `../node_modules/expo-gl`)
   - ExpoHaptics (from `../node_modules/expo-haptics/ios`)
   - ExpoHead (from `../node_modules/expo-router/ios`)
   - ExpoImage (from `../node_modules/expo-image/ios`)
@@ -2422,6 +2430,8 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
+  - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -2515,6 +2525,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-file-system/ios"
   ExpoFont:
     :path: "../node_modules/expo-font/ios"
+  ExpoGL:
+    :path: "../node_modules/expo-gl"
   ExpoHaptics:
     :path: "../node_modules/expo-haptics/ios"
   ExpoHead:
@@ -2610,6 +2622,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-quick-base64:
+    :path: "../node_modules/react-native-quick-base64"
+  react-native-randombytes:
+    :path: "../node_modules/react-native-randombytes"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-webview:
@@ -2711,6 +2727,7 @@ SPEC CHECKSUMS:
   ExpoCamera: e75f6807a2c047f3338bbadd101af4c71a1d13a5
   ExpoFileSystem: b79eadbda7b7f285f378f95f959cc9313a1c9c61
   ExpoFont: cf9d90ec1d3b97c4f513211905724c8171f82961
+  ExpoGL: 08e3c61191e39b9b67b964b78f55337165ec02df
   ExpoHaptics: 807476b0c39e9d82b7270349d6487928ce32df84
   ExpoHead: 7141e494b0773a8f0dc5ca3366ce91b1300f5a9d
   ExpoImage: 6356eb13d3a076a991cf191e4bb22cca91a8f317
@@ -2772,6 +2789,8 @@ SPEC CHECKSUMS:
   React-logger: 7b234de35acb469ce76d6bbb0457f664d6f32f62
   React-Mapbuffer: fbe1da882a187e5898bdf125e1cc6e603d27ecae
   React-microtasksnativemodule: 76905804171d8ccbe69329fc84c57eb7934add7f
+  react-native-quick-base64: 6568199bb2ac8e72ecdfdc73a230fbc5c1d3aac4
+  react-native-randombytes: 4eeddad82d1fd57adda1cd5beffe67d041c9d6de
   react-native-safe-area-context: 42a1b4f8774b577d03b53de7326e3d5757fe9513
   react-native-webview: b29007f4723bca10872028067b07abacfa1cb35a
   React-NativeModulesApple: a9464983ccc0f66f45e93558671f60fc7536e438
@@ -2821,6 +2840,6 @@ SPEC CHECKSUMS:
   Yoga: 051f086b5ccf465ff2ed38a2cf5a558ae01aaaa1
   ZXingObjC: 8898711ab495761b2dbbdec76d90164a6d7e14c5
 
-PODFILE CHECKSUM: 877d5faa39ed904a417dad1d5d4fa9d1a89cad2f
+PODFILE CHECKSUM: 0d4ec6801f3a1948c890442d84b30ab47e48a3dc
 
 COCOAPODS: 1.16.2

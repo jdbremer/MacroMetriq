@@ -31,7 +31,7 @@ export default function LoginScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title">Welcome to Evolve</ThemedText>
+      <ThemedText type="title" style={styles.titleText}>Welcome to MacroMetriq</ThemedText>
       
       <View style={styles.loginForm}>
         <TextInput
@@ -71,6 +71,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#121212',
+  },
+  titleText: {
+    color: '#EAEAEA',
+    fontSize: 48,
+    fontWeight: 'bold',
+    marginBottom: 40,
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    lineHeight: 56,
+    includeFontPadding: false,
   },
   loginForm: {
     width: '100%',
