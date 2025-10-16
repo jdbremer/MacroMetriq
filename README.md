@@ -46,7 +46,15 @@ npm install
 
 **Note**: This project uses native modules (Three.js, react-native-gesture-handler, react-native-reanimated) that require a **development build**. You cannot use Expo Go for this app.
 
-### 3. Install iOS Dependencies (Mac only)
+### 3. Install Git Hooks
+
+```bash
+bash scripts/install-hooks.sh
+```
+
+This installs a pre-commit hook that automatically resets bundle identifiers to defaults before commits.
+
+### 4. Install iOS Dependencies (Mac only)
 
 ```bash
 cd ios
@@ -54,7 +62,7 @@ pod install
 cd ..
 ```
 
-### 4. Set Up Environment Variables
+### 5. Set Up Environment Variables
 
 Create a `.env` file in the root directory (or update `utils/supabase.ts` directly):
 
@@ -69,7 +77,7 @@ To get these credentials:
 3. Go to Project Settings > API
 4. Copy the "Project URL" and "anon/public" key
 
-### 5. Configure Database Schema
+### 6. Configure Database Schema
 
 In your Supabase project, run these SQL commands in the SQL Editor:
 
@@ -151,14 +159,14 @@ CREATE POLICY "Users can delete their own recipes"
   USING (auth.uid() = user_id);
 ```
 
-### 6. Add USDA API Key (Optional but Recommended)
+### 7. Add USDA API Key (Optional but Recommended)
 
 The app uses the USDA FoodData Central API for food search. The code includes a demo key, but you should get your own:
 
 1. Request a free API key at [USDA FoodData Central](https://fdc.nal.usda.gov/api-key-signup.html)
 2. Update the key in `app/(tabs)/meals.tsx` (search for `apiKey` variable)
 
-### 7. Add 3D Model File
+### 8. Add 3D Model File
 
 Place your GLB 3D model file at:
 ```

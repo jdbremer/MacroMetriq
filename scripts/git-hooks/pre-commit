@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Pre-commit hook to reset bundle identifiers in app.json
+
+echo "Running pre-commit hook: Resetting bundle identifiers..."
+
+# Path to app.json
+APP_JSON="app.json"
+
+# Check if app.json exists
+if [ ! -f "$APP_JSON" ]; then
+  echo "Warning: app.json not found, skipping bundle identifier reset"
+  exit 0
+fi
+
+# Default bundle identifiers
+IOS_BUNDLE_ID="com.gomacrometriq.macrometriq"
+ANDROID_PACKAGE="com.gomacrometriq.macrometriq"
+
+# Use sed to replace bundle identifiers
+# For macOS, we need to use sed -i '' (empty string for backup)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS
+  sed -i '' "s/\"bundleIdentifier\": \".*\"/\"bundleIdentifier\": \"$IOS_BUNDLE_ID\"/" "$APP_JSON"
+  sed -i '' "s/\"package\": \".*\"/\"package\": \"$ANDROID_PACKAGE\"/" "$APP_JSON"
+else
+  # Linux
+  sed -i "s/\"bundleIdentifier\": \".*\"/\"bundleIdentifier\": \"$IOS_BUNDLE_ID\"/" "$APP_JSON"
+  sed -i "s/\"package\": \".*\"/\"package\": \"$ANDROID_PACKAGE\"/" "$APP_JSON"
+fi
+
+# Add the modified app.json to the staging area
+git add "$APP_JSON"
+
+echo "✓ Bundle identifiers reset to defaults in app.json"
+echo "  iOS bundleIdentifier: $IOS_BUNDLE_ID"
+echo "  Android package: $ANDROID_PACKAGE"
+
+exit 0
