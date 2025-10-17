@@ -8,28 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		1CD6485172E5A40ECA9580DA /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9580F24DCDAA1E4FFEC415 /* ExpoModulesProvider.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		9C59576B85747C076F527DAA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D1BC7CE92EB284E1C3060EA6 /* PrivacyInfo.xcprivacy */; };
-		A09DAC16B6901F9CFA756DDD /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B401949486C451F1D69E984D /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		E12DFAB86B0BF43B164E36E5 /* libPods-macrometriq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AA64F9C8AB6107DB5D41CB1 /* libPods-macrometriq.a */; };
+		C9053CAA6771BAC8154F7AA1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 320AC86FDCC1D5DAE8C94D35 /* PrivacyInfo.xcprivacy */; };
+		D404B0F615102FE119C400D8 /* libPods-MacroMetriq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34FDACEE21523397E61DE268 /* libPods-MacroMetriq.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		13B07F961A680F5B00A75B9A /* macrometriq.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = macrometriq.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = macrometriq/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = macrometriq/Info.plist; sourceTree = "<group>"; };
-		1521DD04B0D153EE9E88943C /* Pods-macrometriq.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macrometriq.release.xcconfig"; path = "Target Support Files/Pods-macrometriq/Pods-macrometriq.release.xcconfig"; sourceTree = "<group>"; };
-		1AA64F9C8AB6107DB5D41CB1 /* libPods-macrometriq.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-macrometriq.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A05E2B063F9023000D4083A5 /* Pods-macrometriq.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macrometriq.debug.xcconfig"; path = "Target Support Files/Pods-macrometriq/Pods-macrometriq.debug.xcconfig"; sourceTree = "<group>"; };
-		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = macrometriq/SplashScreen.storyboard; sourceTree = "<group>"; };
-		B401949486C451F1D69E984D /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-macrometriq/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		0D008027487FC301F895314A /* Pods-MacroMetriq.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MacroMetriq.debug.xcconfig"; path = "Target Support Files/Pods-MacroMetriq/Pods-MacroMetriq.debug.xcconfig"; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* MacroMetriq.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacroMetriq.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = MacroMetriq/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = MacroMetriq/Info.plist; sourceTree = "<group>"; };
+		320AC86FDCC1D5DAE8C94D35 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = MacroMetriq/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		34FDACEE21523397E61DE268 /* libPods-MacroMetriq.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MacroMetriq.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6C9580F24DCDAA1E4FFEC415 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-MacroMetriq/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = MacroMetriq/SplashScreen.storyboard; sourceTree = "<group>"; };
+		B7E381C051F9B8260FA94D7E /* Pods-MacroMetriq.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MacroMetriq.release.xcconfig"; path = "Target Support Files/Pods-MacroMetriq/Pods-MacroMetriq.release.xcconfig"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		D1BC7CE92EB284E1C3060EA6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = macrometriq/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = macrometriq/AppDelegate.swift; sourceTree = "<group>"; };
-		F11748442D0722820044C1D9 /* macrometriq-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "macrometriq-Bridging-Header.h"; path = "macrometriq/macrometriq-Bridging-Header.h"; sourceTree = "<group>"; };
+		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = MacroMetriq/AppDelegate.swift; sourceTree = "<group>"; };
+		F11748442D0722820044C1D9 /* MacroMetriq-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "MacroMetriq-Bridging-Header.h"; path = "MacroMetriq/MacroMetriq-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,42 +37,42 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E12DFAB86B0BF43B164E36E5 /* libPods-macrometriq.a in Frameworks */,
+				D404B0F615102FE119C400D8 /* libPods-MacroMetriq.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		13B07FAE1A68108700A75B9A /* macrometriq */ = {
+		13B07FAE1A68108700A75B9A /* MacroMetriq */ = {
 			isa = PBXGroup;
 			children = (
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
-				F11748442D0722820044C1D9 /* macrometriq-Bridging-Header.h */,
+				F11748442D0722820044C1D9 /* MacroMetriq-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				D1BC7CE92EB284E1C3060EA6 /* PrivacyInfo.xcprivacy */,
+				320AC86FDCC1D5DAE8C94D35 /* PrivacyInfo.xcprivacy */,
 			);
-			name = macrometriq;
+			name = MacroMetriq;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				1AA64F9C8AB6107DB5D41CB1 /* libPods-macrometriq.a */,
+				34FDACEE21523397E61DE268 /* libPods-MacroMetriq.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3D65A0BDE6D0F2698717451E /* macrometriq */ = {
+		3D0F23B2C415F088A414B282 /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				B401949486C451F1D69E984D /* ExpoModulesProvider.swift */,
+				CB0AD540C29352B748E0242F /* MacroMetriq */,
 			);
-			name = macrometriq;
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -85,12 +85,12 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				13B07FAE1A68108700A75B9A /* macrometriq */,
+				13B07FAE1A68108700A75B9A /* MacroMetriq */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				F24090B49032F78F66363EC3 /* Pods */,
-				B89B203531D6AB4D0699A476 /* ExpoModulesProviders */,
+				9BFA7A3C8743E68B79C279D1 /* Pods */,
+				3D0F23B2C415F088A414B282 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -100,17 +100,19 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* macrometriq.app */,
+				13B07F961A680F5B00A75B9A /* MacroMetriq.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B89B203531D6AB4D0699A476 /* ExpoModulesProviders */ = {
+		9BFA7A3C8743E68B79C279D1 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3D65A0BDE6D0F2698717451E /* macrometriq */,
+				0D008027487FC301F895314A /* Pods-MacroMetriq.debug.xcconfig */,
+				B7E381C051F9B8260FA94D7E /* Pods-MacroMetriq.release.xcconfig */,
 			);
-			name = ExpoModulesProviders;
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -119,42 +121,40 @@
 				BB2F792C24A3F905000567C9 /* Expo.plist */,
 			);
 			name = Supporting;
-			path = macrometriq/Supporting;
+			path = MacroMetriq/Supporting;
 			sourceTree = "<group>";
 		};
-		F24090B49032F78F66363EC3 /* Pods */ = {
+		CB0AD540C29352B748E0242F /* MacroMetriq */ = {
 			isa = PBXGroup;
 			children = (
-				A05E2B063F9023000D4083A5 /* Pods-macrometriq.debug.xcconfig */,
-				1521DD04B0D153EE9E88943C /* Pods-macrometriq.release.xcconfig */,
+				6C9580F24DCDAA1E4FFEC415 /* ExpoModulesProvider.swift */,
 			);
-			name = Pods;
-			path = Pods;
+			name = MacroMetriq;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		13B07F861A680F5B00A75B9A /* macrometriq */ = {
+		13B07F861A680F5B00A75B9A /* MacroMetriq */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "macrometriq" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "MacroMetriq" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				F97029AEA6E657508FD1D11F /* [Expo] Configure project */,
+				A4EFF5F770618CD793D77A3C /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				72B5F6612A546CA2A5CA4512 /* [CP] Embed Pods Frameworks */,
+				421723705FBBED275130E4D7 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = macrometriq;
-			productName = macrometriq;
-			productReference = 13B07F961A680F5B00A75B9A /* macrometriq.app */;
+			name = MacroMetriq;
+			productName = MacroMetriq;
+			productReference = 13B07F961A680F5B00A75B9A /* MacroMetriq.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -166,13 +166,11 @@
 				LastUpgradeCheck = 1130;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = W3276Y9676;
 						LastSwiftMigration = 1250;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "macrometriq" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "MacroMetriq" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -185,7 +183,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* macrometriq */,
+				13B07F861A680F5B00A75B9A /* MacroMetriq */,
 			);
 		};
 /* End PBXProject section */
@@ -198,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				9C59576B85747C076F527DAA /* PrivacyInfo.xcprivacy in Resources */,
+				C9053CAA6771BAC8154F7AA1 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,20 +235,20 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-macrometriq-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-MacroMetriq-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		72B5F6612A546CA2A5CA4512 /* [CP] Embed Pods Frameworks */ = {
+		421723705FBBED275130E4D7 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-macrometriq/Pods-macrometriq-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-MacroMetriq/Pods-MacroMetriq-frameworks.sh",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
@@ -263,7 +261,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-macrometriq/Pods-macrometriq-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MacroMetriq/Pods-MacroMetriq-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
@@ -272,7 +270,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-macrometriq/Pods-macrometriq-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-MacroMetriq/Pods-MacroMetriq-resources.sh",
 				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/EXConstants.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/ExpoConstants_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/ExpoFileSystem/ExpoFileSystem_privacy.bundle",
@@ -315,10 +313,10 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-macrometriq/Pods-macrometriq-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MacroMetriq/Pods-MacroMetriq-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F97029AEA6E657508FD1D11F /* [Expo] Configure project */ = {
+		A4EFF5F770618CD793D77A3C /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -329,18 +327,18 @@
 			inputPaths = (
 				"$(SRCROOT)/.xcode.env",
 				"$(SRCROOT)/.xcode.env.local",
-				"$(SRCROOT)/macrometriq/macrometriq.entitlements",
-				"$(SRCROOT)/Pods/Target Support Files/Pods-macrometriq/expo-configure-project.sh",
+				"$(SRCROOT)/MacroMetriq/MacroMetriq.entitlements",
+				"$(SRCROOT)/Pods/Target Support Files/Pods-MacroMetriq/expo-configure-project.sh",
 			);
 			name = "[Expo] Configure project";
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/Pods/Target Support Files/Pods-macrometriq/ExpoModulesProvider.swift",
+				"$(SRCROOT)/Pods/Target Support Files/Pods-MacroMetriq/ExpoModulesProvider.swift",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-macrometriq/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-MacroMetriq/expo-configure-project.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -350,7 +348,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				A09DAC16B6901F9CFA756DDD /* ExpoModulesProvider.swift in Sources */,
+				1CD6485172E5A40ECA9580DA /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -359,13 +357,11 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A05E2B063F9023000D4083A5 /* Pods-macrometriq.debug.xcconfig */;
+			baseConfigurationReference = 0D008027487FC301F895314A /* Pods-MacroMetriq.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = macrometriq/macrometriq.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = MacroMetriq/MacroMetriq.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = W3276Y9676;
 				ENABLE_BITCODE = NO;
@@ -373,8 +369,8 @@
 					"$(inherited)",
 					"FB_SONARKIT_ENABLED=1",
 				);
-				INFOPLIST_FILE = macrometriq/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				INFOPLIST_FILE = MacroMetriq/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -388,7 +384,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gomacrometriq.macrometriq;
 				PRODUCT_NAME = "MacroMetriq";
-				SWIFT_OBJC_BRIDGING_HEADER = "macrometriq/macrometriq-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "MacroMetriq/MacroMetriq-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -398,17 +394,15 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1521DD04B0D153EE9E88943C /* Pods-macrometriq.release.xcconfig */;
+			baseConfigurationReference = B7E381C051F9B8260FA94D7E /* Pods-MacroMetriq.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = macrometriq/macrometriq.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = MacroMetriq/MacroMetriq.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = W3276Y9676;
-				INFOPLIST_FILE = macrometriq/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				INFOPLIST_FILE = MacroMetriq/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -422,7 +416,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gomacrometriq.macrometriq;
 				PRODUCT_NAME = "MacroMetriq";
-				SWIFT_OBJC_BRIDGING_HEADER = "macrometriq/macrometriq-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "MacroMetriq/MacroMetriq-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -550,7 +544,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "macrometriq" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "MacroMetriq" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -559,7 +553,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "macrometriq" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "MacroMetriq" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

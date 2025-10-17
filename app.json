@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gomacrometriq.macrometriq",
+      "deploymentTarget": "15.5",
       "infoPlist": {
         "NSCameraUsageDescription": "This app needs camera access to scan food barcodes for nutrition tracking.",
         "NSMicrophoneUsageDescription": "This app needs microphone access for video recording.",
