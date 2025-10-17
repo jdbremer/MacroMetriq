@@ -16,19 +16,19 @@ const ProgressBarComponent = React.memo(({ current, goal, color }: ProgressBarPr
   const strokeWidth = 4;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
-  
+
   const animatedOffset = useSharedValue(circumference);
-  
+
   useEffect(() => {
     animatedOffset.value = circumference;
   }, []);
-  
+
   const { targetOffset, diffText } = useMemo(() => {
     const percentage = goal ? Math.min((current / goal) * 100, 100) : 0;
     const targetOffset = circumference - (percentage / 100) * circumference;
     const diff = goal ? Math.round(current - goal) : null;
     const diffText = diff !== null ? (diff > 0 ? `+${diff}` : `${diff}`) : '';
-    
+
     return { targetOffset, diffText };
   }, [current, goal, circumference]);
   

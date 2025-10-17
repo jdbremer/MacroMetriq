@@ -32,22 +32,20 @@ export default function DashboardScreen() {
     { name: 'Strength Training', duration: 45, date: 'Yesterday' }
   ]);
   const [goals, setGoals] = useState<{ calories: number; protein: number; carbs: number; fats: number; created_at: string } | null>(null);
-  const [animKey, setAnimKey] = useState(0);
-  
-  useFocusEffect(
-    useCallback(() => {
-      setAnimKey(prev => prev + 1);
-    }, [])
-  );
-  
+
   useEffect(() => {
     const loadMealTotals = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      
-      const today = new Date().toISOString().split('T')[0];
+
+      // Use local timezone date (same as meals tab)
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const today = `${year}-${month}-${day}`;
       const cacheKey = `meals_${user.id}_${today}`;
-      
+
       // Load from AsyncStorage first
       const cached = await AsyncStorage.getItem(cacheKey);
       if (cached) {
@@ -97,7 +95,7 @@ export default function DashboardScreen() {
           transFat: Math.round(Number(m.trans_fat)),
           unsaturatedFat: Math.round(Number(m.unsaturated_fat)),
         }));
-        
+
         const totals = meals.reduce((acc, m) => ({
           calories: acc.calories + m.calories,
           protein: acc.protein + m.protein,
@@ -109,7 +107,7 @@ export default function DashboardScreen() {
           trans_fat: acc.trans_fat + m.transFat,
           unsaturated_fat: acc.unsaturated_fat + m.unsaturatedFat,
         }), { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugars: 0, saturated_fat: 0, trans_fat: 0, unsaturated_fat: 0 });
-        
+
         setMealTotals(totals);
         await AsyncStorage.setItem(cacheKey, JSON.stringify(meals));
       }
@@ -126,9 +124,14 @@ export default function DashboardScreen() {
   const loadGoals = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    
-    const today = new Date().toISOString().split('T')[0];
-    
+
+    // Use local timezone date (same as meals tab)
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const today = `${year}-${month}-${day}`;
+
     // Check if daily goals snapshot exists for today
     const { data: dailyGoals } = await supabase
       .from('daily_goals')
@@ -231,22 +234,22 @@ export default function DashboardScreen() {
         <ThemedText style={[styles.sectionLabel, { marginTop: 16 }]}>Meal</ThemedText>
         <ThemedView style={styles.statsContainer}>
           <ThemedView style={styles.statCard}>
-            <ProgressBar key={`cal-${animKey}`} current={mealTotals.calories} goal={goals?.calories || null} color="#FF9800" />
+            <ProgressBar current={mealTotals.calories} goal={goals?.calories || null} color="#FF9800" />
             <ThemedText type="subtitle" style={{ textAlign: 'center', color: '#EAEAEA' }}>{mealTotals.calories}</ThemedText>
             <ThemedText style={{ textAlign: 'center', color: '#9E9E9E' }}>Calories</ThemedText>
           </ThemedView>
           <ThemedView style={styles.statCard}>
-            <ProgressBar key={`pro-${animKey}`} current={mealTotals.protein} goal={goals?.protein || null} color="#F50057" />
+            <ProgressBar current={mealTotals.protein} goal={goals?.protein || null} color="#F50057" />
             <ThemedText type="subtitle" style={{ textAlign: 'center', color: '#EAEAEA' }}>{mealTotals.protein}g</ThemedText>
             <ThemedText style={{ textAlign: 'center', color: '#9E9E9E' }}>Protein</ThemedText>
           </ThemedView>
           <ThemedView style={styles.statCard}>
-            <ProgressBar key={`carb-${animKey}`} current={mealTotals.carbs} goal={goals?.carbs || null} color="#76FF03" />
+            <ProgressBar current={mealTotals.carbs} goal={goals?.carbs || null} color="#76FF03" />
             <ThemedText type="subtitle" style={{ textAlign: 'center', color: '#EAEAEA' }}>{mealTotals.carbs}g</ThemedText>
             <ThemedText style={{ textAlign: 'center', color: '#9E9E9E' }}>Carbs</ThemedText>
           </ThemedView>
           <ThemedView style={styles.statCard}>
-            <ProgressBar key={`fat-${animKey}`} current={mealTotals.fat} goal={goals?.fats || null} color="#00E5FF" />
+            <ProgressBar current={mealTotals.fat} goal={goals?.fats || null} color="#00E5FF" />
             <ThemedText type="subtitle" style={{ textAlign: 'center', color: '#EAEAEA' }}>{mealTotals.fat}g</ThemedText>
             <ThemedText style={{ textAlign: 'center', color: '#9E9E9E' }}>Fat</ThemedText>
           </ThemedView>
