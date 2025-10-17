@@ -92,14 +92,58 @@ export default function RecipesScreen() {
     }
   };
 
-  const deleteRecipe = async (id: string) => {
-    const { error } = await supabase.from('recipes').delete().eq('id', id);
+  const addRecipeToMeals = async (recipe: Recipe) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Use local timezone date
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const today = `${year}-${month}-${day}`;
+    const currentHour = now.getHours();
+
+    console.log('[Recipes] Adding recipe to meals:', {
+      user_id: user.id,
+      date: today,
+      hour: currentHour,
+      name: recipe.name,
+      calories: recipe.calories,
+      protein: recipe.protein,
+      carbs: recipe.carbs,
+    });
+
+    const { data, error } = await supabase.from('meals').insert({
+      user_id: user.id,
+      date: today,
+      hour: currentHour,
+      name: recipe.name,
+      calories: recipe.calories,
+      protein: recipe.protein,
+      carbs: recipe.carbs,
+      fiber: recipe.fiber,
+      sugars: recipe.sugars,
+      total_fat: recipe.totalFat,
+      saturated_fat: recipe.saturatedFat,
+      trans_fat: recipe.transFat,
+      unsaturated_fat: recipe.unsaturatedFat,
+    }).select();
+
     if (error) {
-      Alert.alert('Error', 'Failed to delete recipe');
+      console.error('[Recipes] Error adding to meals:', error);
+      Alert.alert('Error', 'Failed to add recipe to meals');
       return;
     }
-    setRecipes(prev => prev.filter(r => r.id !== id));
+
+    console.log('[Recipes] Successfully added to meals:', data);
+
+    // Clear cache so meals tab refreshes
+    const cacheKey = `meals_${user.id}_${today}`;
+    await AsyncStorage.removeItem(cacheKey);
+
     setEditModalVisible(false);
+    router.push('/(tabs)/meals');
   };
 
   const filteredRecipes = recipes.filter(r =>
@@ -155,20 +199,20 @@ export default function RecipesScreen() {
         <ThemedView style={styles.modalOverlay}>
           <ThemedView style={styles.modalContent}>
             <ThemedView style={styles.modalHeader}>
-              <ThemedText type="subtitle">{editingRecipe?.name}</ThemedText>
+              <ThemedText type="subtitle" style={styles.modalTitle}>{editingRecipe?.name}</ThemedText>
               <TouchableOpacity onPress={() => setEditModalVisible(false)} style={styles.closeButton}>
                 <ThemedText style={styles.closeButtonText}>✕</ThemedText>
               </TouchableOpacity>
             </ThemedView>
 
             <ThemedText style={styles.nutritionLabel}>Nutrition (Total)</ThemedText>
-            <ThemedText>{editingRecipe?.calories} cal • {editingRecipe?.protein}g protein • {editingRecipe?.carbs}g carbs</ThemedText>
+            <ThemedText style={styles.nutritionText}>{editingRecipe?.calories} cal • {editingRecipe?.protein}g protein • {editingRecipe?.carbs}g carbs</ThemedText>
 
             <ThemedText style={styles.ingredientsLabel}>Ingredients:</ThemedText>
             <ScrollView style={styles.ingredientsList}>
               {editingRecipe?.ingredients.map((ing, idx) => (
                 <ThemedView key={idx} style={styles.ingredientItem}>
-                  <ThemedText>{ing.name} ({ing.servingMultiplier}x)</ThemedText>
+                  <ThemedText style={styles.ingredientName}>{ing.name} ({ing.servingMultiplier}x)</ThemedText>
                   <ThemedText style={styles.ingredientDetails}>
                     {ing.calories} cal • {ing.protein}g protein
                   </ThemedText>
@@ -178,12 +222,6 @@ export default function RecipesScreen() {
 
             <ThemedView style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.deleteButton]}
-                onPress={() => editingRecipe && deleteRecipe(editingRecipe.id)}
-              >
-                <ThemedText style={styles.buttonText}>Delete</ThemedText>
-              </TouchableOpacity>
-              <TouchableOpacity
                 style={[styles.modalButton, styles.editButton]}
                 onPress={() => {
                   setEditModalVisible(false);
@@ -191,6 +229,12 @@ export default function RecipesScreen() {
                 }}
               >
                 <ThemedText style={styles.buttonText}>Edit</ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.addButton]}
+                onPress={() => editingRecipe && addRecipeToMeals(editingRecipe)}
+              >
+                <ThemedText style={styles.buttonText}>Add</ThemedText>
               </TouchableOpacity>
             </ThemedView>
           </ThemedView>
@@ -266,7 +310,9 @@ const styles = StyleSheet.create({
   },
   closeButton: { position: 'absolute', right: 0, padding: 4 },
   closeButtonText: { fontSize: 24, color: '#EAEAEA' },
+  modalTitle: { color: '#FFFFFF' },
   nutritionLabel: { fontSize: 14, color: '#9E9E9E', marginTop: 12, marginBottom: 4 },
+  nutritionText: { color: '#EAEAEA' },
   ingredientsLabel: { fontSize: 14, color: '#9E9E9E', marginTop: 16, marginBottom: 8 },
   ingredientsList: { maxHeight: 200, marginBottom: 16 },
   ingredientItem: {
@@ -275,6 +321,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
   },
+  ingredientName: { color: '#FFFFFF' },
   ingredientDetails: { fontSize: 12, color: '#9E9E9E', marginTop: 4 },
   modalButtons: {
     flexDirection: 'row',
@@ -283,7 +330,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   modalButton: { flex: 1, padding: 12, borderRadius: 8, alignItems: 'center', marginHorizontal: 4 },
-  deleteButton: { backgroundColor: '#CC0000' },
+  addButton: { backgroundColor: '#007AFF' },
   editButton: { backgroundColor: '#2A2A2A' },
   buttonText: { color: '#EAEAEA' },
 });
