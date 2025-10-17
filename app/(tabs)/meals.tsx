@@ -243,12 +243,55 @@ export default function MealsScreen() {
       useNativeDriver: true,
     }).start();
   }, [actionsMenuOpen]);
-  
-  // Pre-compute date strings and current hour
-  const selectedDateStr = useMemo(() => selectedDate.toISOString().split('T')[0], [selectedDate]);
-  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
-  const currentHour = useMemo(() => new Date().getHours(), []);
+
+  // Create a utility to get normalized date string (local timezone, not UTC)
+  const getLocalDateStr = useCallback((date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }, []);
+
+  // Pre-compute date strings - selectedDateStr uses local timezone
+  const selectedDateStr = useMemo(() => getLocalDateStr(selectedDate), [selectedDate, getLocalDateStr]);
+
+  // State for current time - updates on hour/day transitions
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const todayStr = useMemo(() => getLocalDateStr(currentTime), [currentTime, getLocalDateStr]);
+  const currentHour = useMemo(() => currentTime.getHours(), [currentTime]);
   const isToday = selectedDateStr === todayStr;
+
+  // Smart timer: Updates at hour boundaries (more efficient than every minute)
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const prevHour = currentTime.getHours();
+      const prevDate = getLocalDateStr(currentTime);
+      const nowHour = now.getHours();
+      const nowDate = getLocalDateStr(now);
+
+      // Only update state if hour or date changed
+      if (prevHour !== nowHour || prevDate !== nowDate) {
+        setCurrentTime(now);
+      }
+    };
+
+    // Calculate milliseconds until next minute
+    const now = new Date();
+    const msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+
+    // Initial timeout to sync with minute boundary
+    const initialTimeout = setTimeout(() => {
+      updateTime();
+
+      // Then check every minute at the minute boundary
+      const interval = setInterval(updateTime, 60000);
+
+      return () => clearInterval(interval);
+    }, msUntilNextMinute);
+
+    return () => clearTimeout(initialTimeout);
+  }, [currentTime, getLocalDateStr]);
 
   useEffect(() => {
     // Batch state updates
@@ -512,26 +555,30 @@ export default function MealsScreen() {
     }
   }, [dailyTotals, isToday]);
 
-  // Memoize date formatting
-  const formatDate = useMemo(() => {
-    const today = new Date();
+  // Dynamic date formatting that updates with currentTime
+  const formatDate = useCallback((date: Date) => {
+    const today = new Date(currentTime);
+    today.setHours(0, 0, 0, 0);
+
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
+
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
 
     const todayStr = today.toDateString();
     const yesterdayStr = yesterday.toDateString();
     const tomorrowStr = tomorrow.toDateString();
-    
-    return (date: Date) => {
-      const dateStr = date.toDateString();
-      if (dateStr === todayStr) return 'Today';
-      if (dateStr === yesterdayStr) return 'Yesterday';
-      if (dateStr === tomorrowStr) return 'Tomorrow';
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    };
-  }, []);
+    const dateStr = checkDate.toDateString();
+
+    if (dateStr === todayStr) return 'Today';
+    if (dateStr === yesterdayStr) return 'Yesterday';
+    if (dateStr === tomorrowStr) return 'Tomorrow';
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }, [currentTime]);
 
   const changeDate = (days: number) => {
     const newDate = new Date(selectedDate);
@@ -565,13 +612,13 @@ export default function MealsScreen() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const dateStr = new Date().toISOString().split('T')[0];
+    // Use the selected date, not the current date
     const { data, error } = await supabase
         .from('meals')
         .insert({
           user_id: user.id,
           name: nutritionForm.name,
-          date: dateStr,
+          date: selectedDateStr,
           hour: selectedHour,
           calories: Math.round(nutritionForm.calories),
           protein: Math.round(nutritionForm.protein),
@@ -592,23 +639,39 @@ export default function MealsScreen() {
     }
 
     if (data) {
-      // Only add to local state if viewing today
-      if (isToday) {
-        setMeals(prev => [...prev, {
-          id: data.id,
-          name: data.name,
-          hour: data.hour,
-          calories: Number(data.calories),
-          protein: Number(data.protein),
-          carbs: Number(data.carbs),
-          fiber: Number(data.fiber),
-          sugars: Number(data.sugars),
-          totalFat: Number(data.total_fat),
-          saturatedFat: Number(data.saturated_fat),
-          transFat: Number(data.trans_fat),
-          unsaturatedFat: Number(data.unsaturated_fat),
-        }]);
-      }
+      // Add to local state immediately for selected date
+      setMeals(prev => [...prev, {
+        id: data.id,
+        name: data.name,
+        hour: data.hour,
+        calories: Number(data.calories),
+        protein: Number(data.protein),
+        carbs: Number(data.carbs),
+        fiber: Number(data.fiber),
+        sugars: Number(data.sugars),
+        totalFat: Number(data.total_fat),
+        saturatedFat: Number(data.saturated_fat),
+        transFat: Number(data.trans_fat),
+        unsaturatedFat: Number(data.unsaturated_fat),
+      }]);
+
+      // Update cache for selected date
+      const cacheKey = `meals_${user.id}_${selectedDateStr}`;
+      const newMeals = [...meals, {
+        id: data.id,
+        name: data.name,
+        hour: data.hour,
+        calories: Number(data.calories),
+        protein: Number(data.protein),
+        carbs: Number(data.carbs),
+        fiber: Number(data.fiber),
+        sugars: Number(data.sugars),
+        totalFat: Number(data.total_fat),
+        saturatedFat: Number(data.saturated_fat),
+        transFat: Number(data.trans_fat),
+        unsaturatedFat: Number(data.unsaturated_fat),
+      }];
+      await AsyncStorage.setItem(cacheKey, JSON.stringify(newMeals));
 
       // Add to recent foods (upsert)
       await supabase
@@ -638,6 +701,9 @@ export default function MealsScreen() {
   const updateMeal = async () => {
     if (!editingMeal || !nutritionForm.name.trim()) return;
 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     const { error } = await supabase
         .from('meals')
         .update({
@@ -659,9 +725,15 @@ export default function MealsScreen() {
       return;
     }
 
-    setMeals(prev => prev.map(m =>
+    const updatedMeals = meals.map(m =>
         m.id === editingMeal.id ? { ...nutritionForm, id: m.id, hour: m.hour } : m
-    ));
+    );
+    setMeals(updatedMeals);
+
+    // Update cache
+    const cacheKey = `meals_${user.id}_${selectedDateStr}`;
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(updatedMeals));
+
     loadFoodHistory();
     setEditModalVisible(false);
     setEditingMeal(null);
@@ -671,6 +743,9 @@ export default function MealsScreen() {
   };
 
   const deleteMeal = async (id: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     const { error } = await supabase
         .from('meals')
         .delete()
@@ -681,7 +756,13 @@ export default function MealsScreen() {
       return;
     }
 
-    setMeals(prev => prev.filter(m => m.id !== id));
+    const updatedMeals = meals.filter(m => m.id !== id);
+    setMeals(updatedMeals);
+
+    // Update cache
+    const cacheKey = `meals_${user.id}_${selectedDateStr}`;
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(updatedMeals));
+
     setEditModalVisible(false);
     setEditingMeal(null);
     setServingMultiplier(1);

@@ -34,50 +34,79 @@ interface NutritionData {
   saturatedFat: number;
   transFat: number;
   unsaturatedFat: number;
+  servingSize?: string;
+  gramWeight?: number;
 }
 
 interface RecentFood extends NutritionData {
   servingMultiplier: number;
 }
 
-type OFFProduct = {
-  product_name?: string;
-  brands?: string;
-  generic_name?: string;
-  serving_size?: string;
-  nutriments?: Record<string, any>;
+// Check if USDA food has actual serving size data
+// Most USDA branded foods have servingSize, so we'll show all results
+const hasServingSize = (food: any): boolean => {
+  // Always return true for USDA foods since they typically have serving info
+  return true;
 };
 
-const mapOpenFoodFactsToForm = (p: OFFProduct): NutritionData => {
-  const n = p?.nutriments ?? {};
-  const pick = (keyServing: string, key100g: string) => {
-    const val = n[keyServing] ?? n[key100g] ?? 0;
-    const num = typeof val === 'number' ? val : parseFloat(String(val));
-    return Number((isNaN(num) ? 0 : num).toFixed(1));
+// USDA FoodData Central mapping
+const mapUSDAToForm = (food: any): NutritionData => {
+  const nutrients = food.foodNutrients || [];
+
+  const getNutrient = (nutrientId: number) => {
+    const nutrient = nutrients.find((n: any) => n.nutrientId === nutrientId);
+    return nutrient ? Number(nutrient.value || 0) : 0;
   };
-  const energyServing = n['energy-kcal_serving'] ?? (n['energy_serving'] ? n['energy_serving'] / 4.184 : undefined);
-  const energy100g = n['energy-kcal_100g'] ?? (n['energy_100g'] ? n['energy_100g'] / 4.184 : undefined);
-  const kcal = Math.round(
-      (typeof energyServing === 'number' ? energyServing :
-          typeof energy100g === 'number' ? energy100g : 0) || 0
-  );
-  const name = (p?.product_name?.trim() || p?.generic_name?.trim() || (p?.brands ? `${p.brands} (Unknown Product)` : 'Unknown Product'));
+
+  // USDA Nutrient IDs
+  // 1008 = Energy (kcal)
+  // 1003 = Protein
+  // 1005 = Carbohydrate
+  // 1079 = Fiber
+  // 2000 = Sugars, total
+  // 1004 = Total lipid (fat)
+  // 1258 = Fatty acids, total saturated
+  // 1257 = Fatty acids, total trans
+  // 1292 = Fatty acids, total monounsaturated
+  // 1293 = Fatty acids, total polyunsaturated
+
+  const monounsaturated = getNutrient(1292);
+  const polyunsaturated = getNutrient(1293);
+
+  // Extract serving size from USDA API
+  let servingSize = '100g';
+  let gramWeight = 100;
+
+  if (food.servingSize && food.servingSizeUnit) {
+    servingSize = `${food.servingSize}${food.servingSizeUnit}`;
+    gramWeight = Number(food.servingSize) || 100;
+  } else if (food.servingSize) {
+    servingSize = `${food.servingSize}g`;
+    gramWeight = Number(food.servingSize) || 100;
+  } else if (food.foodPortions && food.foodPortions.length > 0) {
+    const portion = food.foodPortions[0];
+    if (portion.gramWeight) {
+      gramWeight = Number(portion.gramWeight);
+      servingSize = `${portion.gramWeight}g`;
+      if (portion.modifier) {
+        servingSize = `${portion.gramWeight}g (${portion.modifier})`;
+      }
+    }
+  }
+
   return {
-    name,
-    calories: kcal,
-    protein: pick('proteins_serving', 'proteins_100g'),
-    carbs: pick('carbohydrates_serving', 'carbohydrates_100g'),
-    fiber: pick('fiber_serving', 'fiber_100g'),
-    sugars: pick('sugars_serving', 'sugars_100g'),
-    totalFat: pick('fat_serving', 'fat_100g'),
-    saturatedFat: pick('saturated-fat_serving', 'saturated-fat_100g'),
-    transFat: pick('trans-fat_serving', 'trans-fat_100g'),
-    unsaturatedFat: Number(
-        (
-            (n['monounsaturated-fat_serving'] ?? n['monounsaturated-fat_100g'] ?? 0) +
-            (n['polyunsaturated-fat_serving'] ?? n['polyunsaturated-fat_100g'] ?? 0)
-        ).toFixed?.(1) ?? 0
-    ),
+    name: food.description || 'Unknown Food',
+    calories: Math.round(getNutrient(1008)),
+    protein: Number(getNutrient(1003).toFixed(1)),
+    carbs: Number(getNutrient(1005).toFixed(1)),
+    fiber: Number(getNutrient(1079).toFixed(1)),
+    sugars: Number(getNutrient(2000).toFixed(1)),
+    totalFat: Number(getNutrient(1004).toFixed(1)),
+    saturatedFat: Number(getNutrient(1258).toFixed(1)),
+    transFat: Number(getNutrient(1257).toFixed(1)),
+    unsaturatedFat: Number((monounsaturated + polyunsaturated).toFixed(1)),
+    servingSize,
+    gramWeight,
   };
 };
 
@@ -123,6 +152,7 @@ export default function RecipeBuilderScreen() {
     loadRecipes();
     return () => { isMounted.current = false; };
   }, [params.recipeId]);
+
 
   const loadRecipe = async (id: string) => {
     const { data, error } = await supabase
@@ -370,7 +400,7 @@ export default function RecipeBuilderScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ThemedText style={styles.backButtonText}>‹</ThemedText>
         </TouchableOpacity>
-        <ThemedText type="title">{params.recipeId ? 'Edit Recipe' : 'New Recipe'}</ThemedText>
+        <ThemedText type="title" style={styles.titleText}>{params.recipeId ? 'Edit Recipe' : 'New Recipe'}</ThemedText>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerCancelButton}>
           <ThemedText style={styles.headerCancelButtonText}>Cancel</ThemedText>
         </TouchableOpacity>
@@ -448,7 +478,7 @@ export default function RecipeBuilderScreen() {
           <ScrollView style={styles.modalScrollView}>
             <ThemedView style={styles.modalContent}>
               <ThemedView style={styles.modalHeader}>
-                <ThemedText type="subtitle" style={styles.modalTitle}>Add Ingredient</ThemedText>
+                <ThemedText type="subtitle" style={[styles.modalTitle, { color: '#FFFFFF' }]}>Add Ingredient</ThemedText>
                 <TouchableOpacity onPress={() => {
                   setAddIngredientModalVisible(false);
                   setShowManualForm(false);
@@ -515,58 +545,77 @@ export default function RecipeBuilderScreen() {
                     placeholder="Search foods..."
                     placeholderTextColor="#999"
                     value={searchQuery}
-                    onChangeText={(text) => {
-                      setSearchQuery(text);
-                      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-                      if (text.trim().length > 2) {
+                    onChangeText={setSearchQuery}
+                    onSubmitEditing={async () => {
+                      console.log('[Recipe Builder] Search submitted:', searchQuery);
+                      if (searchQuery.trim().length > 2) {
                         setSearchLoading(true);
-                        searchTimeoutRef.current = setTimeout(async () => {
-                          try {
-                            const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(text)}&search_simple=1&action=process&json=1&page_size=20`);
-                            const data = await res.json();
-                            setSearchResults(data.products || []);
-                          } catch (e) {
-                            console.error('Search error:', e);
-                          }
-                          setSearchLoading(false);
-                        }, 500);
-                      } else {
-                        setSearchResults([]);
+                        try {
+                          const apiKey = 'rMin6NojFBwrfeRUGfKgdAf8NnAPYAThJHIrJEqE';
+                          const url = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(searchQuery)}&pageSize=50&api_key=${apiKey}`;
+                          console.log('[Recipe Builder] Fetching:', url);
+                          const res = await fetch(url);
+                          const data = await res.json();
+                          const foods = data.foods || [];
+                          console.log('[Recipe Builder] Results:', foods.length, 'foods');
+                          console.log('[Recipe Builder] Setting search results...');
+                          setSearchResults(foods);
+                          console.log('[Recipe Builder] Search results state updated');
+                        } catch (e) {
+                          console.error('[Recipe Builder] Search error:', e);
+                          setSearchResults([]);
+                        }
                         setSearchLoading(false);
+                      } else {
+                        console.log('[Recipe Builder] Query too short');
                       }
                     }}
+                    returnKeyType="search"
                   />
                   {searchLoading && (
-                    <ThemedText style={{ textAlign: 'center', marginBottom: 8 }}>⏳ Searching...</ThemedText>
+                    <ThemedText style={{ textAlign: 'center', marginBottom: 8, color: '#EAEAEA' }}>⏳ Searching...</ThemedText>
                   )}
-                  <ThemedView style={styles.searchResultsContainer}>
-                    <ScrollView style={styles.searchResultsList} nestedScrollEnabled={true}>
-                      {searchResults.map((product, idx) => {
-                        const mapped = mapOpenFoodFactsToForm(product);
-                        return (
-                          <TouchableOpacity
-                            key={idx}
-                            style={styles.historyItem}
-                            onPress={() => {
-                              setNutritionForm(mapped);
-                              setBaseNutrition(mapped);
-                              setServingMultiplier(1);
-                              setShowSearch(false);
-                              setSearchResults([]);
-                              setShowManualForm(true);
-                            }}
-                          >
-                            <ThemedText style={styles.historyItemName}>{mapped.name}</ThemedText>
-                            <ThemedText style={styles.historyItemDetails}>
-                              {mapped.calories} cal • {mapped.protein}g protein
-                            </ThemedText>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </ScrollView>
-                  </ThemedView>
-                  <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => { setShowSearch(false); setSearchResults([]); }}>
-                    <ThemedText style={styles.buttonText}>Back</ThemedText>
+                  {!searchLoading && searchResults.length === 0 && searchQuery.length > 0 && (
+                    <ThemedText style={{ textAlign: 'center', marginBottom: 8, color: '#9E9E9E' }}>No products found</ThemedText>
+                  )}
+                  {searchResults.length > 0 && (
+                    <ThemedView style={styles.searchResultsContainer}>
+                      <ScrollView style={styles.searchResultsList} nestedScrollEnabled={true}>
+                        {searchResults.map((product, idx) => {
+                          const mapped = mapUSDAToForm(product);
+                          return (
+                            <TouchableOpacity
+                              key={idx}
+                              style={styles.historyItem}
+                              onPress={() => {
+                                setNutritionForm(mapped);
+                                setBaseNutrition(mapped);
+                                setServingMultiplier(1);
+                                setShowSearch(false);
+                                setSearchResults([]);
+                                setSearchQuery('');
+                                setShowManualForm(true);
+                              }}
+                            >
+                              <ThemedText style={styles.historyItemName}>{mapped.name}</ThemedText>
+                              <ThemedText style={styles.historyItemDetails}>
+                                {mapped.servingSize} • {mapped.calories} cal • {mapped.protein}g protein
+                              </ThemedText>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </ScrollView>
+                    </ThemedView>
+                  )}
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.cancelButton]}
+                    onPress={() => {
+                      setShowSearch(false);
+                      setSearchResults([]);
+                      setSearchQuery('');
+                    }}
+                  >
+                    <ThemedText style={styles.backButtonModalText}>Back</ThemedText>
                   </TouchableOpacity>
                 </>
               ) : showRecipes && !showHistory && !showManualForm && !showSearch ? (
@@ -613,7 +662,7 @@ export default function RecipeBuilderScreen() {
                       ))}
                   </ScrollView>
                   <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => setShowRecipes(false)}>
-                    <ThemedText style={styles.buttonText}>Back</ThemedText>
+                    <ThemedText style={styles.backButtonModalText}>Back</ThemedText>
                   </TouchableOpacity>
                 </>
               ) : showHistory && !showManualForm && !showSearch && !showRecipes ? (
@@ -660,7 +709,7 @@ export default function RecipeBuilderScreen() {
                       ))}
                   </ScrollView>
                   <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => setShowHistory(false)}>
-                    <ThemedText style={styles.buttonText}>Back</ThemedText>
+                    <ThemedText style={styles.backButtonModalText}>Back</ThemedText>
                   </TouchableOpacity>
                 </>
               ) : showManualForm ? (
@@ -808,7 +857,7 @@ export default function RecipeBuilderScreen() {
 
                   <ThemedView style={styles.modalButtons}>
                     <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => setShowManualForm(false)}>
-                      <ThemedText style={styles.buttonText}>Back</ThemedText>
+                      <ThemedText style={styles.backButtonModalText}>Back</ThemedText>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.modalButton, styles.addButton2]} onPress={() => {
                       if (nutritionForm.name.trim()) {
@@ -871,6 +920,7 @@ const styles = StyleSheet.create({
   },
   backButton: { padding: 8 },
   backButtonText: { fontSize: 32, fontWeight: 'bold', color: '#EAEAEA' },
+  titleText: { color: '#FFFFFF' },
   headerCancelButton: {
     backgroundColor: '#2A2A2A',
     paddingHorizontal: 16,
@@ -926,7 +976,7 @@ const styles = StyleSheet.create({
     borderColor: '#2A2A2A',
     borderWidth: 1,
   },
-  scanButtonText: { color: '#EAEAEA', fontSize: 16 },
+  scanButtonText: { color: '#FFFFFF', fontSize: 16 },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 12, color: '#EAEAEA' },
   ingredientCard: {
     backgroundColor: 'rgba(255,255,255,0.1)',
@@ -1030,8 +1080,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   searchResultsContainer: {
-    maxHeight: 200,
-    marginBottom: 16,
+    height: 450,
+    marginBottom: 12,
+    backgroundColor: 'transparent',
   },
   searchResultsList: {
     flex: 1,
@@ -1070,12 +1121,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   cancelButton: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: '#CC0000',
   },
   addButton2: {
-    backgroundColor: '#2A2A2A',
+    backgroundColor: '#007AFF',
   },
   buttonText: {
     color: '#EAEAEA',
+  },
+  backButtonModalText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
 });
